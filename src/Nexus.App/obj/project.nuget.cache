@@ -1,8 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "81u86cnrFbc=",
+  "dgSpecHash": "9xa+UD0fLP8=",
   "success": true,
   "projectFilePath": "C:\\Codes\\Nexus\\src\\Nexus.App\\Nexus.App.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\Jimmy\\.nuget\\packages\\communitytoolkit.mvvm\\8.4.0\\communitytoolkit.mvvm.8.4.0.nupkg.sha512",
+    "C:\\Users\\Jimmy\\.nuget\\packages\\newtonsoft.json\\13.0.4\\newtonsoft.json.13.0.4.nupkg.sha512",
+    "C:\\Users\\Jimmy\\.nuget\\packages\\system.management\\10.0.3\\system.management.10.0.3.nupkg.sha512"
+  ],
   "logs": []
 }

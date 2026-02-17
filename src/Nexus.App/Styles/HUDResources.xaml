@@ -1,0 +1,55 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2000/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2000/xaml">
+    <Color x:Key="CyberCyanColor">#00FFFF</Color>
+    <Color x:Key="CyberCyanGlowColor">#2000FFFF</Color>
+    <Color x:Key="WarningColor">#FF8A00</Color>
+    <Color x:Key="CriticalColor">#FF2D2D</Color>
+    <Color x:Key="SuccessColor">#00FF7A</Color>
+    <Color x:Key="BaseBackgroundColor">#070A0F</Color>
+    <Color x:Key="PanelBackgroundColor">#10161E</Color>
+    <Color x:Key="BorderColor">#1E2A3A</Color>
+    <SolidColorBrush x:Key="CyberCyanBrush" Color="{StaticResource CyberCyanColor}" />
+    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}" />
+    <SolidColorBrush x:Key="CriticalBrush" Color="{StaticResource CriticalColor}" />
+    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}" />
+    <SolidColorBrush x:Key="BaseBackgroundBrush" Color="{StaticResource BaseBackgroundColor}" />
+    <SolidColorBrush x:Key="PanelBackgroundBrush" Color="{StaticResource PanelBackgroundColor}" />
+    <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}" />
+    <LinearGradientBrush x:Key="PanelHeaderGradient" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#2000FFFF" Offset="0" />
+        <GradientStop Color="#0000FFFF" Offset="1" />
+    </LinearGradientBrush>
+    <Style x:Key="HUDTextBase" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="FontFamily" Value="Segoe UI Semibold" />
+        <Setter Property="FontSize" Value="12" />
+    </Style>
+    <Style x:Key="HUDHeader" TargetType="TextBlock" BasedOn="{StaticResource HUDTextBase}">
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{StaticResource CyberCyanBrush}" />
+    </Style>
+    <Style x:Key="HUDPanel" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource PanelBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="2" />
+        <Setter Property="Margin" Value="5" />
+    </Style>
+    <Style x:Key="CircularGauge" TargetType="ProgressBar">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ProgressBar">
+                    <Grid>
+                        <Ellipse Stroke="{StaticResource BorderBrush}" StrokeThickness="8" />
+                        <Ellipse Stroke="{TemplateBinding Foreground}" StrokeThickness="8" StrokeDashArray="20,1" Opacity="0.8" />
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock Text="{Binding Value, RelativeSource={RelativeSource TemplatedParent}, StringFormat={}{0:0}%}" Style="{StaticResource HUDHeader}" HorizontalAlignment="Center" />
+                            <TextBlock Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource HUDTextBase}" FontSize="10" HorizontalAlignment="Center" Opacity="0.6" />
+                        </StackPanel>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
