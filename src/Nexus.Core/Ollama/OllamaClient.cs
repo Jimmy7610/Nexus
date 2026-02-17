@@ -88,7 +88,7 @@ namespace Nexus.Core.Ollama
         }
     }
 
-    public class OllamaTagsResponse { public List<OllamaModel> Models { get; set; } }
-    public class OllamaModel { [JsonProperty("name")] public string Name { get; set; } }
-    public class OllamaGenerateResponse { [JsonProperty("response")] public string Response { get; set; } }
+    public class OllamaTagsResponse { public List<OllamaModel>? Models { get; set; } }
+    public class OllamaModel { [JsonProperty("name")] public string? Name { get; set; } }
+    public class OllamaGenerateResponse { [JsonProperty("response")] public string? Response { get; set; } }
 }

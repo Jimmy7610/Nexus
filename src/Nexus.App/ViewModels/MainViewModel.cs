@@ -23,7 +23,7 @@ namespace Nexus.App.ViewModels
 
         [ObservableProperty] private SystemMetrics _currentMetrics;
         [ObservableProperty] private StorageAnalysisResult _storageResult;
-        [ObservableProperty] private string _chatInput;
+        [ObservableProperty] private string _chatInput = "";
         [ObservableProperty] private string _aiStatus = "OLLAMA: READY";
         [ObservableProperty] private object _currentView;
 
@@ -55,7 +55,7 @@ namespace Nexus.App.ViewModels
             SendChatCommand = new AsyncRelayCommand(SendChatAsync);
             OpenWindowsSettingsCommand = new RelayCommand(OpenWindowsSettings);
 
-            ChatHistory.Add(new ChatMessage { Role = "System", Content = "NEXUS AI online. Assessing system health..." });
+            ChatHistory.Add(new ChatMessage { Role = "CORE", Content = "NEXUS AI online. Assessing system health..." });
             Task.Run(UpdateMetricsAsync);
         }
 
@@ -85,7 +85,7 @@ namespace Nexus.App.ViewModels
             AiStatus = "THINKING...";
             var response = await _ollamaClient.GetRecommendationAsync(userMsg, CurrentMetrics, Disks);
             ChatHistory.Add(new ChatMessage { Role = "Nexus", Content = response });
-            AiStatus = "OLLAMA: IDLE";
+            AiStatus = "OLLAMA: CORE_IDLE";
         }
 
         private void OpenWindowsSettings()

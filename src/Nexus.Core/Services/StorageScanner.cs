@@ -10,8 +10,8 @@ namespace Nexus.Core.Services
 {
     public class StorageScanner : IStorageScanner
     {
-        private CancellationTokenSource _cts;
-        public event Action<StorageAnalysisResult> ProgressUpdated;
+        private CancellationTokenSource? _cts;
+        public event Action<StorageAnalysisResult>? ProgressUpdated;
 
         public async Task<StorageAnalysisResult> ScanDriveAsync(string driveLetter)
         {
@@ -21,7 +21,7 @@ namespace Nexus.Core.Services
             return await Task.Run(() =>
             {
                 var folderWeights = new Dictionary<string, long>();
-                var allFiles = new List<FileEntry>();
+                var allFiles = new List<NexusFileEntry>();
                 long totalFiles = 0;
 
                 Queue<string> queue = new Queue<string>();
