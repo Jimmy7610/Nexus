@@ -40,7 +40,7 @@ namespace Nexus.Core.Services
                             
                             totalFiles++;
                             long size = file.Length;
-                            allFiles.Add(new FileEntry { Name = file.Name, Path = file.FullName, SizeBytes = size });
+                            allFiles.Add(new NexusFileEntry { Name = file.Name, Path = file.FullName, SizeBytes = size });
                             
                             // Attribute size to parent folders
                             string parent = currentDir;
@@ -79,7 +79,7 @@ namespace Nexus.Core.Services
                 result.TopFolders = folderWeights
                     .OrderByDescending(f => f.Value)
                     .Take(10)
-                    .Select(f => new FileEntry { Name = Path.GetFileName(f.Key) ?? f.Key, Path = f.Key, SizeBytes = f.Value })
+                    .Select(f => new NexusFileEntry { Name = Path.GetFileName(f.Key) ?? f.Key, Path = f.Key, SizeBytes = f.Value })
                     .ToList();
 
                 ProgressUpdated?.Invoke(result);

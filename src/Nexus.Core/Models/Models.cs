@@ -48,14 +48,14 @@ namespace Nexus.Core.Models
 
     public class StorageAnalysisResult
     {
-        public List<FileEntry> TopFolders { get; set; } = new();
-        public List<FileEntry> TopFiles { get; set; } = new();
+        public List<NexusFileEntry> TopFolders { get; set; } = new();
+        public List<NexusFileEntry> TopFiles { get; set; } = new();
         public long TotalFiles { get; set; }
         public int ProgressPercentage { get; set; }
         public bool IsScanning { get; set; }
     }
 
-    public class FileEntry
+    public class NexusFileEntry
     {
         public string Name { get; set; }
         public string Path { get; set; }

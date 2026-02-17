@@ -6,9 +6,9 @@ namespace Nexus.Tests
     public class ModelTests
     {
         [Fact]
-        public void FileEntry_FormattedSize_ReturnsCorrectSuffix()
+        public void NexusFileEntry_FormattedSize_ReturnsCorrectSuffix()
         {
-            var entry = new FileEntry { SizeBytes = 1024 * 1024 * 5 }; // 5 MB
+            var entry = new NexusFileEntry { SizeBytes = 1024 * 1024 * 5 }; // 5 MB
             Assert.Contains("5.0 MB", entry.FormattedSize);
 
             entry.SizeBytes = 2048; // 2 KB
