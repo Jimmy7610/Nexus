@@ -19,7 +19,7 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="70"/> <!-- Header -->
-                <RowDefinition Height="180"/> <!-- Peripherals: Gauges -->
+                <RowDefinition Height="180"/> <!-- Peripherals: Gauges (Secondary) -->
                 <RowDefinition Height="*"/>   <!-- Primary Content -->
                 <RowDefinition Height="35"/>  <!-- Footer -->
             </Grid.RowDefinitions>
@@ -33,8 +33,8 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <Path Data="M0,0 L12,0 L12,12 L0,12 Z M3,3 L9,3 L9,9 L3,9 Z" Fill="{StaticResource CyberCyanBrush}" Width="12" Margin="0,0,15,0" Opacity="0.7"/>
-                    <TextBlock Text="NEXUS" Style="{StaticResource HUDTitle}"/>
+                    <Path Data="M0,0 L12,0 L12,12 L0,12 Z M3,3 L9,3 L9,9 L3,9 Z" Fill="{StaticResource CyberCyanBrush}" Width="12" Margin="0,0,15,0" Opacity="0.9"/>
+                    <TextBlock Text="NEXUS MISSION CONTROL" Style="{StaticResource HUDTitle}"/>
                 </StackPanel>
 
                 <!-- Navigation Tabs -->
@@ -45,13 +45,13 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding CurrentMetrics.Uptime, Mode=OneWay, StringFormat={}SYS_UPTIME: {0:hh}h {0:mm}m}" Style="{StaticResource HUDPanelHeader}" Margin="20,0"/>
+                    <TextBlock Text="{Binding CurrentMetrics.Uptime, Mode=OneWay, StringFormat={}SYS_UPTIME: {0:hh}h {0:mm}m}" Style="{StaticResource HUDPanelHeader}" Margin="20,0" Opacity="0.8"/>
                     <Button Content="↺" Command="{Binding RestartCommand}" Style="{StaticResource HUDButton}" Width="36" Height="30" Margin="5,0"/>
                     <Button Content="✕" Click="Close_Click" Style="{StaticResource HUDButton}" Width="36" Height="30" Margin="5,0" Foreground="{StaticResource CriticalBrush}"/>
                 </StackPanel>
             </Grid>
 
-            <!-- PERIPHERAL GAUGES (Calm Telemetry) -->
+            <!-- SECONDARY GAUGES -->
             <Grid Grid.Row="1" Margin="20,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -79,29 +79,29 @@
             <!-- ACTIVE CONTENT -->
             <Grid Grid.Row="2" Margin="25,10">
                 
-                <!-- OVERVIEW VIEW (Centered Hierarchy) -->
+                <!-- OVERVIEW VIEW (Tiered Hierarchy) -->
                 <Grid Visibility="{Binding CurrentView, Converter={StaticResource ViewToVisibilityConverter}, ConverterParameter=OVERVIEW}">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="280"/> <!-- Muted Side -->
+                        <ColumnDefinition Width="280"/> <!-- Tertiary Sidebar -->
                         <ColumnDefinition Width="*"/>   <!-- Primary Center -->
-                        <ColumnDefinition Width="280"/> <!-- Muted Side -->
+                        <ColumnDefinition Width="280"/> <!-- Tertiary Sidebar -->
                     </Grid.ColumnDefinitions>
 
-                    <!-- Left Sidebar (Muted) -->
-                    <ContentControl Grid.Column="0" Style="{StaticResource HUDPanel}" Opacity="0.6">
+                    <!-- Left Sidebar (Tertiary) -->
+                    <ContentControl Grid.Column="0" Style="{StaticResource HUDPanel}" Opacity="0.85">
                         <Grid>
                             <TextBlock Text="NETWORK TELEMETRY" Style="{StaticResource HUDPanelHeader}"/>
                             <StackPanel VerticalAlignment="Center" Margin="0,30,0,0">
                                 <Grid Margin="0,8">
                                     <TextBlock Text="UPLINK" Style="{StaticResource HUDLabel}"/>
-                                    <TextBlock Text="{Binding NetworkMetrics.UploadSpeedMbps, StringFormat={}{0:F2} MBPS}" Style="{StaticResource HUDMonoReadout}" HorizontalAlignment="Right"/>
+                                    <TextBlock Text="{Binding NetworkMetrics.UploadSpeedMbps, StringFormat={}{0:F2} MBPS}" Style="{StaticResource HUDMonoReadout}" HorizontalAlignment="Right" Foreground="{StaticResource WarningBrush}"/>
                                 </Grid>
                                 <Grid Margin="0,8">
                                     <TextBlock Text="DOWNLINK" Style="{StaticResource HUDLabel}"/>
-                                    <TextBlock Text="{Binding NetworkMetrics.DownloadSpeedMbps, StringFormat={}{0:F2} MBPS}" Style="{StaticResource HUDMonoReadout}" HorizontalAlignment="Right"/>
+                                    <TextBlock Text="{Binding NetworkMetrics.DownloadSpeedMbps, StringFormat={}{0:F2} MBPS}" Style="{StaticResource HUDMonoReadout}" HorizontalAlignment="Right" Foreground="{StaticResource SuccessBrush}"/>
                                 </Grid>
-                                <Border Height="1" Background="{StaticResource BorderBrush}" Opacity="0.1" Margin="0,20"/>
-                                <TextBlock Text="LINK STABLE" Style="{StaticResource HUDMicroLabel}" HorizontalAlignment="Center"/>
+                                <Border Height="1" Background="{StaticResource BorderBrush}" Opacity="0.2" Margin="0,20"/>
+                                <TextBlock Text="LINK STABLE" Style="{StaticResource HUDMicroLabel}" HorizontalAlignment="Center" Opacity="0.4"/>
                             </StackPanel>
                         </Grid>
                     </ContentControl>
@@ -109,14 +109,14 @@
                     <!-- PRIMARY CENTER: PERFORMANCE MATRIX -->
                     <ContentControl Grid.Column="1" Style="{StaticResource HUDPanel}">
                         <Grid>
-                            <TextBlock Text="LIVE PERFORMANCE MATRIX" Style="{StaticResource HUDPanelHeader}" Opacity="0.8"/>
+                            <TextBlock Text="LIVE PERFORMANCE MATRIX" Style="{StaticResource HUDPanelHeader}" Opacity="0.9"/>
                             <ContentControl Style="{StaticResource HUDChartFrame}" Margin="0,30,0,10">
                                 <Grid>
                                     <Path Data="M0,80 L30,70 L60,75 L90,40 L120,50 L150,20 L180,30 L210,10" 
-                                          Stroke="{StaticResource CyberCyanBrush}" StrokeThickness="2.5" 
+                                          Stroke="{StaticResource CyberCyanBrush}" StrokeThickness="3.0" 
                                           Stretch="Fill" Margin="40">
                                         <Path.Effect>
-                                            <DropShadowEffect BlurRadius="12" Color="{StaticResource CyberCyanColor}" ShadowDepth="0" Opacity="0.6"/>
+                                            <DropShadowEffect BlurRadius="15" Color="{StaticResource CyberCyanColor}" ShadowDepth="0" Opacity="0.8"/>
                                         </Path.Effect>
                                     </Path>
                                 </Grid>
@@ -124,16 +124,16 @@
                         </Grid>
                     </ContentControl>
 
-                    <!-- Right Sidebar (Muted) -->
-                    <ContentControl Grid.Column="2" Style="{StaticResource HUDPanel}" Opacity="0.6">
+                    <!-- Right Sidebar (Tertiary) -->
+                    <ContentControl Grid.Column="2" Style="{StaticResource HUDPanel}" Opacity="0.85">
                         <Grid>
                             <TextBlock Text="CORE PROCESSES" Style="{StaticResource HUDPanelHeader}"/>
                             <ItemsControl ItemsSource="{Binding CurrentMetrics.Processes}" Margin="0,30,0,0">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Grid Margin="0,5">
-                                            <TextBlock Text="{Binding Name}" Style="{StaticResource HUDTextBase}" FontSize="11" Opacity="0.7"/>
-                                            <TextBlock Text="{Binding FormattedRam}" Style="{StaticResource HUDMonoReadout}" HorizontalAlignment="Right" FontSize="11" Opacity="0.6"/>
+                                        <Grid Margin="0,6">
+                                            <TextBlock Text="{Binding Name}" Style="{StaticResource HUDTextBase}" FontSize="11"/>
+                                            <TextBlock Text="{Binding FormattedRam}" Style="{StaticResource HUDMonoReadout}" HorizontalAlignment="Right" FontSize="11" Foreground="{StaticResource SuccessBrush}" Opacity="0.9"/>
                                         </Grid>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -146,41 +146,39 @@
                 <Grid Visibility="{Binding CurrentView, Converter={StaticResource ViewToVisibilityConverter}, ConverterParameter=STORAGE}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="360"/>
+                        <ColumnDefinition Width="380"/>
                     </Grid.ColumnDefinitions>
 
                     <ContentControl Grid.Column="0" Style="{StaticResource HUDPanel}">
                         <Grid>
                             <TextBlock Text="STORAGE ANALYTICS" Style="{StaticResource HUDPanelHeader}"/>
                             <ScrollViewer Margin="0,35,0,0" VerticalScrollBarVisibility="Hidden">
-                                <StackPanel>
-                                    <ItemsControl ItemsSource="{Binding StorageResult.TopFolders}">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <Grid Margin="0,6">
-                                                    <TextBlock Text="{Binding Path}" Style="{StaticResource HUDTextBase}" Opacity="0.6" MaxWidth="450" TextTrimming="CharacterEllipsis"/>
-                                                    <TextBlock Text="{Binding FormattedSize}" Style="{StaticResource HUDMonoReadout}" HorizontalAlignment="Right"/>
-                                                </Grid>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </StackPanel>
+                                <ItemsControl ItemsSource="{Binding StorageResult.TopFolders}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,8">
+                                                <TextBlock Text="{Binding Path}" Style="{StaticResource HUDTextBase}" Opacity="0.9" MaxWidth="450" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding FormattedSize}" Style="{StaticResource HUDMonoReadout}" HorizontalAlignment="Right" Foreground="{StaticResource SuccessBrush}"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </ScrollViewer>
                         </Grid>
                     </ContentControl>
 
-                    <ContentControl Grid.Column="1" Style="{StaticResource HUDPanel}" Opacity="0.8">
+                    <ContentControl Grid.Column="1" Style="{StaticResource HUDPanel}">
                         <Grid>
                             <TextBlock Text="SCAN STATUS" Style="{StaticResource HUDPanelHeader}"/>
                             <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="{Binding StorageResult.TotalFiles, StringFormat={}{0:N0}}" Style="{StaticResource HUDMonoReadout}" FontSize="36" HorizontalAlignment="Center" Margin="0,10"/>
-                                <TextBlock Text="FILES INDEXED" Style="{StaticResource HUDLabel}" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding StorageResult.TotalFiles, StringFormat={}{0:N0}}" Style="{StaticResource HUDMonoReadout}" FontSize="40" HorizontalAlignment="Center" Margin="0,15"/>
+                                <TextBlock Text="FILES INDEXED" Style="{StaticResource HUDLabel}" HorizontalAlignment="Center" Opacity="0.8"/>
                                 
-                                <Button Content="RESCAN" Command="{Binding StartScanCommand}" CommandParameter="C:\" 
-                                        Style="{StaticResource HUDButton}" Margin="40,40,40,10" Height="40"
+                                <Button Content="RESCAN TARGET" Command="{Binding StartScanCommand}" CommandParameter="C:\" 
+                                        Style="{StaticResource HUDButton}" Margin="40,40,40,10" Height="45"
                                         IsEnabled="{Binding StorageResult.IsScanning, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverted}"/>
                                 
-                                <Button Content="ABORT" Command="{Binding CancelScanCommand}" 
+                                <Button Content="ABORT MISSION" Command="{Binding CancelScanCommand}" 
                                         Style="{StaticResource HUDButton}" Margin="40,0" Foreground="{StaticResource CriticalBrush}"
                                         Visibility="{Binding StorageResult.IsScanning, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                             </StackPanel>
@@ -188,34 +186,34 @@
                     </ContentControl>
                 </Grid>
 
-                <!-- AI CORE (Minimalist Interlink) -->
+                <!-- AI CORE (Operational Interlink) -->
                 <Grid Visibility="{Binding CurrentView, Converter={StaticResource ViewToVisibilityConverter}, ConverterParameter=AI}">
                     <ContentControl Style="{StaticResource HUDPanel}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="260"/>
+                                <ColumnDefinition Width="280"/>
                             </Grid.ColumnDefinitions>
 
                             <Grid Grid.Column="0" Margin="10">
                                 <TextBlock Text="NEURAL INTERLINK" Style="{StaticResource HUDPanelHeader}"/>
-                                <ListBox ItemsSource="{Binding ChatHistory}" Background="Transparent" BorderThickness="0" Margin="0,30,0,60" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                                <ListBox ItemsSource="{Binding ChatHistory}" Background="Transparent" BorderThickness="0" Margin="0,30,0,65" ScrollViewer.VerticalScrollBarVisibility="Hidden">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
-                                            <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="0,15" Opacity="0.8">
+                                            <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="0,15">
                                                 <StackPanel>
-                                                    <TextBlock Text="{Binding Role}" Style="{StaticResource HUDPanelHeader}" FontSize="8"/>
-                                                    <TextBlock Text="{Binding Content}" Style="{StaticResource HUDTextBase}" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                                                    <TextBlock Text="{Binding Role}" Style="{StaticResource HUDPanelHeader}" FontSize="8" Margin="0,0,0,5"/>
+                                                    <TextBlock Text="{Binding Content}" Style="{StaticResource HUDTextBase}" TextWrapping="Wrap"/>
                                                 </StackPanel>
                                             </Border>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
                                 </ListBox>
 
-                                <TextBox Grid.Row="1" Text="{Binding ChatInput, UpdateSourceTrigger=PropertyChanged}" 
-                                         VerticalAlignment="Bottom" Height="40"
-                                         Background="#05FFFFFF" Foreground="White" BorderBrush="{StaticResource BorderBrush}" 
-                                         Padding="15,0" VerticalContentAlignment="Center" Opacity="0.8">
+                                <TextBox Text="{Binding ChatInput, UpdateSourceTrigger=PropertyChanged}" 
+                                         VerticalAlignment="Bottom" Height="45"
+                                         Background="#08FFFFFF" Foreground="White" BorderBrush="{StaticResource BorderBrush}" 
+                                         Padding="15,0" VerticalContentAlignment="Center" FontFamily="Consolas">
                                     <TextBox.InputBindings>
                                         <KeyBinding Key="Enter" Command="{Binding SendChatCommand}"/>
                                     </TextBox.InputBindings>
@@ -223,10 +221,12 @@
                             </Grid>
 
                             <StackPanel Grid.Column="1" Margin="20,40,10,10">
-                                <TextBlock Text="MODEL_INFO" Style="{StaticResource HUDPanelHeader}"/>
-                                <TextBlock Text="{Binding ActiveAiModel}" Style="{StaticResource HUDMonoReadout}" Margin="0,10,0,30" Opacity="0.6"/>
-                                <Button Content="HEALTH REPORT" Command="{Binding QuickPromptCommand}" CommandParameter="Summarize system health." Style="{StaticResource HUDButton}" Margin="0,5"/>
-                                <Button Content="OPTIMIZE" Command="{Binding QuickPromptCommand}" CommandParameter="Suggest optimizations." Style="{StaticResource HUDButton}" Margin="0,5"/>
+                                <TextBlock Text="ACTIVE MODEL" Style="{StaticResource HUDPanelHeader}"/>
+                                <TextBlock Text="{Binding ActiveAiModel}" Style="{StaticResource HUDMonoReadout}" Margin="0,10,0,30" Foreground="{StaticResource SuccessBrush}"/>
+                                
+                                <TextBlock Text="QUICK ACTIONS" Style="{StaticResource HUDPanelHeader}" Margin="0,0,0,10" Opacity="0.6"/>
+                                <Button Content="SYSTEM HEALTH" Command="{Binding QuickPromptCommand}" CommandParameter="Summarize system health." Style="{StaticResource HUDButton}" Margin="0,5"/>
+                                <Button Content="OPTIMIZE DATA" Command="{Binding QuickPromptCommand}" CommandParameter="Suggest optimizations." Style="{StaticResource HUDButton}" Margin="0,5"/>
                             </StackPanel>
                         </Grid>
                     </ContentControl>
@@ -236,9 +236,14 @@
 
             <!-- FOOTER -->
             <Grid Grid.Row="3" Margin="30,0">
-                <TextBlock Text="NEXUS MISSION CONTROL // v1.2.1-CALM" Style="{StaticResource HUDMicroLabel}" VerticalAlignment="Center" Opacity="0.15"/>
+                <TextBlock Text="NEXUS MISSION CONTROL // v1.2.2-ACTIVE // [ENERGY_HIERARCHY: RESTORED]" Style="{StaticResource HUDMicroLabel}" VerticalAlignment="Center" Opacity="0.3"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding AiStatus}" Style="{StaticResource HUDPanelHeader}" Opacity="0.6"/>
+                    <Ellipse Width="6" Height="6" Fill="{StaticResource SuccessBrush}" VerticalAlignment="Center" Margin="0,0,8,0">
+                        <Ellipse.Effect>
+                            <DropShadowEffect BlurRadius="8" Color="{StaticResource SuccessColor}" ShadowDepth="0" Opacity="0.6"/>
+                        </Ellipse.Effect>
+                    </Ellipse>
+                    <TextBlock Text="{Binding AiStatus}" Style="{StaticResource HUDPanelHeader}" Foreground="{StaticResource SuccessBrush}" Opacity="0.9"/>
                 </StackPanel>
             </Grid>
         </Grid>

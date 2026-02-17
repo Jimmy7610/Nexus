@@ -10,7 +10,7 @@
     <Color x:Key="PanelBackgroundColor">#E610161E</Color>
     <Color x:Key="BorderColor">#2A3E59</Color>
     <Color x:Key="GlowColor">#2000FFFF</Color>
-    <Color x:Key="InnerGlowColor">#0800FFFF</Color>
+    <Color x:Key="InnerGlowColor">#1500FFFF</Color>
 
     <!-- BRUSHES -->
     <SolidColorBrush x:Key="CyberCyanBrush" Color="{StaticResource CyberCyanColor}" />
@@ -23,9 +23,9 @@
     <SolidColorBrush x:Key="GlowBrush" Color="{StaticResource GlowColor}" />
     <SolidColorBrush x:Key="InnerGlowBrush" Color="{StaticResource InnerGlowColor}" />
 
-    <!-- TYPOGRAPHY TOKENS (Balanced Hierarchy) -->
+    <!-- TYPOGRAPHY TOKENS (Tiered Energy) -->
     <Style x:Key="HUDTextBase" TargetType="TextBlock">
-        <Setter Property="Foreground" Value="#D0FFFFFF" />
+        <Setter Property="Foreground" Value="White" />
         <Setter Property="FontFamily" Value="Segoe UI" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="VerticalAlignment" Value="Center"/>
@@ -35,35 +35,35 @@
         <Setter Property="FontSize" Value="16" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Foreground" Value="{StaticResource CyberCyanBrush}" />
-        <Setter Property="Opacity" Value="0.8"/>
+        <Setter Property="Opacity" Value="0.9"/>
     </Style>
 
     <Style x:Key="HUDPanelHeader" TargetType="TextBlock" BasedOn="{StaticResource HUDTextBase}">
         <Setter Property="FontSize" Value="9" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Foreground" Value="{StaticResource CyberCyanBrush}" />
-        <Setter Property="Opacity" Value="0.4"/>
+        <Setter Property="Opacity" Value="0.6"/>
     </Style>
 
     <Style x:Key="HUDLabel" TargetType="TextBlock" BasedOn="{StaticResource HUDTextBase}">
         <Setter Property="FontSize" Value="9" />
-        <Setter Property="Opacity" Value="0.3" />
+        <Setter Property="Opacity" Value="0.5" />
     </Style>
 
     <Style x:Key="HUDMicroLabel" TargetType="TextBlock" BasedOn="{StaticResource HUDTextBase}">
         <Setter Property="FontSize" Value="8" />
-        <Setter Property="Opacity" Value="0.15" />
+        <Setter Property="Opacity" Value="0.2" />
         <Setter Property="FontFamily" Value="Consolas"/>
     </Style>
 
     <Style x:Key="HUDMonoReadout" TargetType="TextBlock" BasedOn="{StaticResource HUDTextBase}">
         <Setter Property="FontFamily" Value="Consolas" />
-        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Foreground" Value="White"/>
     </Style>
 
-    <!-- HUD PANEL (Intentional, Calm) -->
+    <!-- HUD PANEL (Authoritative, Operational) -->
     <Style x:Key="HUDPanel" TargetType="ContentControl">
         <Setter Property="Background" Value="{StaticResource PanelBackgroundBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
@@ -74,14 +74,17 @@
                 <ControlTemplate TargetType="ContentControl">
                     <Grid>
                         <Border Background="{TemplateBinding Background}" CornerRadius="2"/>
-                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2" Opacity="0.5"/>
+                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2" Opacity="0.8"/>
                         
-                        <!-- Muted Corner Accents -->
-                        <Canvas IsHitTestVisible="False" Opacity="0.15">
-                            <Path Data="M0,4 L0,0 L4,0" Stroke="{StaticResource CyberCyanBrush}" StrokeThickness="1" Canvas.Left="2" Canvas.Top="2"/>
-                            <Path Data="M-4,0 L0,0 L0,4" Stroke="{StaticResource CyberCyanBrush}" StrokeThickness="1" Canvas.Right="2" Canvas.Top="2"/>
-                            <Path Data="M0,-4 L0,0 L4,0" Stroke="{StaticResource CyberCyanBrush}" StrokeThickness="1" Canvas.Left="2" Canvas.Bottom="2"/>
-                            <Path Data="M-4,0 L0,0 L0,-4" Stroke="{StaticResource CyberCyanBrush}" StrokeThickness="1" Canvas.Right="2" Canvas.Bottom="2"/>
+                        <!-- Internal Glow (Static) -->
+                        <Border BorderBrush="{StaticResource InnerGlowBrush}" BorderThickness="1,1,0,0" Margin="1" CornerRadius="1" Opacity="0.15"/>
+
+                        <!-- Corner Accents -->
+                        <Canvas IsHitTestVisible="False" Opacity="0.4">
+                            <Path Data="M0,6 L0,0 L6,0" Stroke="{StaticResource CyberCyanBrush}" StrokeThickness="1" Canvas.Left="2" Canvas.Top="2"/>
+                            <Path Data="M-6,0 L0,0 L0,6" Stroke="{StaticResource CyberCyanBrush}" StrokeThickness="1" Canvas.Right="2" Canvas.Top="2"/>
+                            <Path Data="M0,-6 L0,0 L6,0" Stroke="{StaticResource CyberCyanBrush}" StrokeThickness="1" Canvas.Left="2" Canvas.Bottom="2"/>
+                            <Path Data="M-6,0 L0,0 L0,-6" Stroke="{StaticResource CyberCyanBrush}" StrokeThickness="1" Canvas.Right="2" Canvas.Bottom="2"/>
                         </Canvas>
 
                         <ContentPresenter Margin="15,18,15,15"/>
@@ -91,35 +94,38 @@
         </Setter>
     </Style>
 
-    <!-- CALM PERIPHERAL GAUGE (No Glow, Thinner Arcs) -->
+    <!-- SECONDARY ENERGY GAUGE (Operational Strength) -->
     <Style x:Key="CircularGauge" TargetType="ProgressBar">
         <Setter Property="Foreground" Value="{StaticResource CyberCyanBrush}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ProgressBar">
-                    <Grid Width="130" Height="130" Opacity="0.5">
-                        <Ellipse Stroke="{StaticResource BorderBrush}" StrokeThickness="1" Opacity="0.2"/>
+                    <Grid Width="130" Height="130">
+                        <Ellipse Stroke="{StaticResource BorderBrush}" StrokeThickness="1" Opacity="0.4"/>
                         
-                        <!-- Background Arc -->
-                        <Ellipse Stroke="{StaticResource BorderBrush}" StrokeThickness="4" Margin="10" Opacity="0.1" StrokeDashArray="0.2, 0.05"/>
+                        <!-- Operational Frame -->
+                        <Ellipse Stroke="{StaticResource BorderBrush}" StrokeThickness="5" Margin="8" Opacity="0.15" StrokeDashArray="0.2, 0.05"/>
 
-                        <!-- Foreground Arc (Value Representation) -->
+                        <!-- Active Data Arc -->
                         <Ellipse Stroke="{TemplateBinding Foreground}" 
-                                 StrokeThickness="4" 
-                                 Margin="10"
-                                 Opacity="0.6" 
-                                 StrokeDashArray="0.2, 0.05"/>
+                                 StrokeThickness="6" 
+                                 Margin="8"
+                                 Opacity="0.85" 
+                                 StrokeDashArray="0.2, 0.05">
+                            <Ellipse.Effect>
+                                <DropShadowEffect BlurRadius="12" Color="{Binding Foreground.Color, RelativeSource={RelativeSource TemplatedParent}}" ShadowDepth="0" Opacity="0.3"/>
+                            </Ellipse.Effect>
+                        </Ellipse>
 
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                             <TextBlock Text="{Binding Value, RelativeSource={RelativeSource TemplatedParent}, StringFormat={}{0:0}}" 
                                        Style="{StaticResource HUDMonoReadout}" 
-                                       FontSize="24" 
-                                       HorizontalAlignment="Center" 
-                                       Opacity="0.8"/>
+                                       FontSize="28" 
+                                       HorizontalAlignment="Center" />
                             <TextBlock Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" 
                                        Style="{StaticResource HUDPanelHeader}" 
                                        HorizontalAlignment="Center" 
-                                       Margin="0,2,0,0"/>
+                                       Margin="0,2,0,0" Opacity="1"/>
                         </StackPanel>
                     </Grid>
                 </ControlTemplate>
@@ -127,24 +133,24 @@
         </Setter>
     </Style>
 
-    <!-- CENTER DOMINANT CHART -->
+    <!-- PRIMARY ENERGY CHART (High Contrast Authority) -->
     <Style x:Key="HUDChartFrame" TargetType="ContentControl">
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Background" Value="#02FFFFFF"/>
+        <Setter Property="Background" Value="#04FFFFFF"/>
         <Setter Property="Margin" Value="5"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ContentControl">
                     <Grid>
-                        <!-- Primary Gridlines -->
-                        <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,1,1" Opacity="0.05">
+                        <!-- High Depth Grid -->
+                        <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,1,1" Opacity="0.1">
                            <Border.Background>
                                <DrawingBrush TileMode="Tile" Viewport="0,0,50,50" ViewportUnits="Absolute">
                                    <DrawingBrush.Drawing>
                                        <GeometryDrawing Geometry="M0,0 L50,0 L50,50 L0,50 Z">
                                            <GeometryDrawing.Pen>
-                                               <Pen Brush="{StaticResource BorderBrush}" Thickness="0.2"/>
+                                               <Pen Brush="{StaticResource BorderBrush}" Thickness="0.3"/>
                                            </GeometryDrawing.Pen>
                                        </GeometryDrawing>
                                    </DrawingBrush.Drawing>
@@ -154,38 +160,41 @@
 
                         <ContentPresenter/>
 
-                        <!-- Primary Focus Accents (Brackets) -->
-                        <Path Data="M0,8 L0,0 L8,0" Stroke="{StaticResource CyberCyanBrush}" StrokeThickness="1.5" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="-1" Opacity="0.6"/>
-                        <Path Data="M0,-8 L0,0 L8,0" Stroke="{StaticResource CyberCyanBrush}" StrokeThickness="1.5" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="-1" Opacity="0.6"/>
-                        <Path Data="M0,8 L0,0 L-8,0" Stroke="{StaticResource CyberCyanBrush}" StrokeThickness="1.5" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="-1" Opacity="0.6"/>
-                        <Path Data="M0,-8 L0,0 L-8,0" Stroke="{StaticResource CyberCyanBrush}" StrokeThickness="1.5" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="-1" Opacity="0.6"/>
+                        <!-- Authoritative Primary Brackets -->
+                        <Path Data="M0,12 L0,0 L12,0" Stroke="{StaticResource CyberCyanBrush}" StrokeThickness="2" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="-1" Opacity="0.8"/>
+                        <Path Data="M0,-12 L0,0 L12,0" Stroke="{StaticResource CyberCyanBrush}" StrokeThickness="2" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="-1" Opacity="0.8"/>
+                        <Path Data="M0,12 L0,0 L-12,0" Stroke="{StaticResource CyberCyanBrush}" StrokeThickness="2" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="-1" Opacity="0.8"/>
+                        <Path Data="M0,-12 L0,0 L-12,0" Stroke="{StaticResource CyberCyanBrush}" StrokeThickness="2" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="-1" Opacity="0.8"/>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
-    <!-- HUD TABS (Clean High-Contrast) -->
+    <!-- HUD TABS (Authoritative High-Contrast) -->
     <Style x:Key="HUDTabItem" TargetType="RadioButton">
-        <Setter Property="Foreground" Value="#60FFFFFF"/>
+        <Setter Property="Foreground" Value="#80FFFFFF"/>
         <Setter Property="FontSize" Value="12"/>
-        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="RadioButton">
-                    <Grid Background="Transparent" Margin="20,0">
+                    <Grid Background="Transparent" Margin="25,0">
                         <StackPanel>
                             <ContentPresenter x:Name="Content" Margin="0,15"/>
-                            <Border x:Name="Indicator" Height="2" Background="{StaticResource CyberCyanBrush}" 
-                                    Margin="0,0,0,0" CornerRadius="1" Visibility="Collapsed"/>
+                            <Border x:Name="Indicator" Height="3" Background="{StaticResource CyberCyanBrush}" 
+                                    Margin="0,0,0,0" CornerRadius="1.5" Visibility="Collapsed">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="10" Color="{StaticResource CyberCyanColor}" ShadowDepth="0" Opacity="0.5"/>
+                                </Border.Effect>
+                            </Border>
                         </StackPanel>
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="True">
                             <Setter TargetName="Indicator" Property="Visibility" Value="Visible"/>
                             <Setter Property="Foreground" Value="White"/>
-                            <Setter Property="FontWeight" Value="SemiBold"/>
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Foreground" Value="White"/>
@@ -198,8 +207,8 @@
 
     <!-- Standard Button Style -->
     <Style x:Key="HUDButton" TargetType="Button">
-        <Setter Property="Background" Value="#05FFFFFF"/>
-        <Setter Property="Foreground" Value="#B0FFFFFF"/>
+        <Setter Property="Background" Value="#10FFFFFF"/>
+        <Setter Property="Foreground" Value="#E0FFFFFF"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="15,5"/>
@@ -210,14 +219,14 @@
                         <Border x:Name="BG" Background="{TemplateBinding Background}" 
                                 BorderBrush="{TemplateBinding BorderBrush}" 
                                 BorderThickness="{TemplateBinding BorderThickness}" 
-                                CornerRadius="1" Opacity="0.6"/>
+                                CornerRadius="1"/>
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="BG" Property="BorderBrush" Value="{StaticResource CyberCyanBrush}"/>
                             <Setter Property="Foreground" Value="White"/>
-                            <Setter TargetName="BG" Property="Opacity" Value="1"/>
+                            <Setter TargetName="BG" Property="Background" Value="#20FFFFFF"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
