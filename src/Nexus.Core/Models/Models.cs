@@ -12,6 +12,7 @@ namespace Nexus.Core.Models
         public TimeSpan Uptime { get; set; }
         public double GpuUsage { get; set; } // Placeholder
         public List<ActiveProcess> Processes { get; set; } = new();
+        public string ActiveModel { get; set; } = "OLLAMA: READY";
     }
 
     public class ActiveProcess
@@ -53,19 +54,31 @@ namespace Nexus.Core.Models
     {
         public List<NexusFileEntry> TopFolders { get; set; } = new();
         public List<NexusFileEntry> TopFiles { get; set; } = new();
+        public List<FileCategory> FileTypeDistribution { get; set; } = new();
         public long TotalFiles { get; set; }
         public int ProgressPercentage { get; set; }
         public bool IsScanning { get; set; }
+        public string ScanDuration { get; set; } = "00:00";
+        public string ScannedDrives { get; set; } = "";
+        public int ErrorCount { get; set; }
+    }
+
+    public class FileCategory
+    {
+        public string Extension { get; set; } = "";
+        public int Count { get; set; }
+        public long SizeBytes { get; set; }
+        public string FormattedSize => NexusFileEntry.FormatSize(SizeBytes);
     }
 
     public class NexusFileEntry
     {
-        public string Name { get; set; }
-        public string Path { get; set; }
+        public string Name { get; set; } = "";
+        public string Path { get; set; } = "";
         public long SizeBytes { get; set; }
         public string FormattedSize => FormatSize(SizeBytes);
 
-        private static string FormatSize(long bytes)
+        public static string FormatSize(long bytes)
         {
             string[] suffixes = { "B", "KB", "MB", "GB", "TB" };
             int counter = 0;

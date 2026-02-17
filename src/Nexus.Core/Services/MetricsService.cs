@@ -11,7 +11,10 @@ namespace Nexus.Core.Services
 {
     public class MetricsService : IMetricsService
     {
-        private readonly PerformanceCounter _cpuCounter;
+        private PerformanceCounter? _cpuCounter;
+        private PerformanceCounter? _netSentCounter;
+        private PerformanceCounter? _netReceivedCounter;
+        private bool _netCountersInitialized;
 
         public MetricsService()
         {
@@ -19,8 +22,26 @@ namespace Nexus.Core.Services
             {
                 _cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
                 _cpuCounter.NextValue(); 
+                InitializeNetworkCounters();
             }
-            catch { /* Fallback or log if counters are disabled */ }
+            catch { }
+        }
+
+        private void InitializeNetworkCounters()
+        {
+            if (_netCountersInitialized) return;
+            try
+            {
+                var category = new PerformanceCounterCategory("Network Interface");
+                var instance = category.GetInstanceNames().FirstOrDefault();
+                if (instance != null)
+                {
+                    _netSentCounter = new PerformanceCounter("Network Interface", "Bytes Sent/sec", instance);
+                    _netReceivedCounter = new PerformanceCounter("Network Interface", "Bytes Received/sec", instance);
+                    _netCountersInitialized = true;
+                }
+            }
+            catch { }
         }
 
         public async Task<SystemMetrics> GetSystemMetricsAsync()
@@ -57,6 +78,7 @@ namespace Nexus.Core.Services
             try
             {
                 metrics.Processes = Process.GetProcesses()
+                    .Where(p => p.Id != 0)
                     .OrderByDescending(p => p.PrivateMemorySize64)
                     .Take(5)
                     .Select(p => new ActiveProcess
@@ -93,7 +115,19 @@ namespace Nexus.Core.Services
 
         public async Task<NetworkMetrics> GetNetworkMetricsAsync()
         {
-            return new NetworkMetrics { DownloadSpeedMbps = 0, UploadSpeedMbps = 0 };
+            var metrics = new NetworkMetrics();
+            try
+            {
+                if (!_netCountersInitialized) InitializeNetworkCounters();
+                
+                if (_netSentCounter != null && _netReceivedCounter != null)
+                {
+                    metrics.UploadSpeedMbps = Math.Round((_netSentCounter.NextValue() * 8) / 1024 / 1024, 2);
+                    metrics.DownloadSpeedMbps = Math.Round((_netReceivedCounter.NextValue() * 8) / 1024 / 1024, 2);
+                }
+            }
+            catch { }
+            return metrics;
         }
     }
 }

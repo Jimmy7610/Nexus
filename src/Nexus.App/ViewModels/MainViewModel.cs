@@ -21,18 +21,24 @@ namespace Nexus.App.ViewModels
         private readonly IOllamaClient _ollamaClient;
         private readonly DispatcherTimer _timer;
 
-        [ObservableProperty] private SystemMetrics _currentMetrics;
-        [ObservableProperty] private StorageAnalysisResult _storageResult;
+        [ObservableProperty] private SystemMetrics _currentMetrics = new();
+        [ObservableProperty] private NetworkMetrics _networkMetrics = new();
+        [ObservableProperty] private StorageAnalysisResult _storageResult = new();
         [ObservableProperty] private string _chatInput = "";
-        [ObservableProperty] private string _aiStatus = "OLLAMA: READY";
-        [ObservableProperty] private object _currentView;
+        [ObservableProperty] private string _aiStatus = "OLLAMA: INITIALIZING";
+        [ObservableProperty] private string _activeAiModel = "NONE";
+        [ObservableProperty] private object _currentView = "OVERVIEW";
 
         public ObservableCollection<DiskMetrics> Disks { get; } = new();
         public ObservableCollection<ChatMessage> ChatHistory { get; } = new();
 
-        public ICommand StartScanCommand { get; }
+        public IAsyncRelayCommand<string> StartScanCommand { get; }
+        public ICommand CancelScanCommand { get; }
         public IAsyncRelayCommand SendChatCommand { get; }
+        public IAsyncRelayCommand<string> QuickPromptCommand { get; }
         public ICommand OpenWindowsSettingsCommand { get; }
+        public ICommand RestartCommand { get; }
+        public ICommand NavigateCommand { get; }
 
         public MainViewModel()
         {
@@ -40,35 +46,63 @@ namespace Nexus.App.ViewModels
             _storageScanner = new StorageScanner();
             _ollamaClient = new OllamaClient();
 
-            _storageScanner.ProgressUpdated += (res) => StorageResult = res;
+            _storageScanner.ProgressUpdated += (res) => {
+                App.Current.Dispatcher.Invoke(() => StorageResult = res);
+            };
 
             _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-            _timer.Tick += async (s, e) => await UpdateMetricsAsync();
+            _timer.Tick += async (s, e) => await UpdateTelemetryAsync();
             _timer.Start();
 
-            StartScanCommand = new AsyncRelayCommand(async () => {
-                AiStatus = "SCANNING DISK...";
-                StorageResult = await _storageScanner.ScanDriveAsync("C:\\");
-                AiStatus = "SCAN COMPLETE";
+            StartScanCommand = new AsyncRelayCommand<string>(async (drive) => {
+                await _storageScanner.ScanDriveAsync(drive ?? "C:\\");
             });
 
+            CancelScanCommand = new RelayCommand(() => _storageScanner.CancelScan());
             SendChatCommand = new AsyncRelayCommand(SendChatAsync);
-            OpenWindowsSettingsCommand = new RelayCommand(OpenWindowsSettings);
+            QuickPromptCommand = new AsyncRelayCommand<string>(async (p) => {
+                ChatInput = p ?? "";
+                await SendChatAsync();
+            });
 
-            ChatHistory.Add(new ChatMessage { Role = "CORE", Content = "NEXUS AI online. Assessing system health..." });
-            Task.Run(UpdateMetricsAsync);
+            OpenWindowsSettingsCommand = new RelayCommand(OpenWindowsSettings);
+            RestartCommand = new RelayCommand(ExecuteRestart);
+            NavigateCommand = new RelayCommand<string>((view) => CurrentView = view ?? "OVERVIEW");
+
+            ChatHistory.Add(new ChatMessage { Role = "CORE", Content = "NEXUS AI online. System monitors active." });
+            Task.Run(InitializeAiStatusAsync);
         }
 
-        private async Task UpdateMetricsAsync()
+        private async Task InitializeAiStatusAsync()
+        {
+            var status = await _ollamaClient.GetStatusAsync();
+            AiStatus = status.isOnline ? "OLLAMA: READY" : "OLLAMA: OFFLINE";
+            ActiveAiModel = status.activeModel;
+        }
+
+        private async Task UpdateTelemetryAsync()
         {
             try
             {
                 CurrentMetrics = await _metricsService.GetSystemMetricsAsync();
+                NetworkMetrics = await _metricsService.GetNetworkMetricsAsync();
                 var disks = await _metricsService.GetDiskMetricsAsync();
                 
                 App.Current.Dispatcher.Invoke(() => {
-                    Disks.Clear();
-                    foreach (var d in disks) Disks.Add(d);
+                    var currentDisks = disks.ToList();
+                    if (Disks.Count != currentDisks.Count)
+                    {
+                        Disks.Clear();
+                        foreach (var d in currentDisks) Disks.Add(d);
+                    }
+                    else
+                    {
+                        for (int i = 0; i < currentDisks.Count; i++)
+                        {
+                            Disks[i].TotalSpaceBytes = currentDisks[i].TotalSpaceBytes;
+                            Disks[i].FreeSpaceBytes = currentDisks[i].FreeSpaceBytes;
+                        }
+                    }
                 });
             }
             catch { }
@@ -80,12 +114,36 @@ namespace Nexus.App.ViewModels
 
             var userMsg = ChatInput;
             ChatInput = string.Empty;
-            ChatHistory.Add(new ChatMessage { Role = "User", Content = userMsg });
+            ChatHistory.Add(new ChatMessage { Role = "USER", Content = userMsg });
 
-            AiStatus = "THINKING...";
-            var response = await _ollamaClient.GetRecommendationAsync(userMsg, CurrentMetrics, Disks);
-            ChatHistory.Add(new ChatMessage { Role = "Nexus", Content = response });
-            AiStatus = "OLLAMA: CORE_IDLE";
+            AiStatus = "OLLAMA: THINKING";
+            var response = await _ollamaClient.GetRecommendationAsync(userMsg, CurrentMetrics, Disks, StorageResult);
+            ChatHistory.Add(new ChatMessage { Role = "NEXUS", Content = response });
+            
+            var status = await _ollamaClient.GetStatusAsync();
+            AiStatus = status.isOnline ? "OLLAMA: READY" : "OLLAMA: OFFLINE";
+            ActiveAiModel = status.activeModel;
+        }
+
+        private void ExecuteRestart()
+        {
+            var result = System.Windows.MessageBox.Show("Confirm System Decoupling (Restart NEXUS)?", "RESTART_PROMPT", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Question);
+            if (result == System.Windows.MessageBoxResult.Yes)
+            {
+                try
+                {
+                    var currentExe = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
+                    if (currentExe != null)
+                    {
+                        System.Diagnostics.Process.Start(currentExe);
+                        System.Windows.Application.Current.Shutdown();
+                    }
+                }
+                catch
+                {
+                    System.Windows.MessageBox.Show("Restart Protocol Failed.", "ERROR", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                }
+            }
         }
 
         private void OpenWindowsSettings()
@@ -97,11 +155,10 @@ namespace Nexus.App.ViewModels
             catch { }
         }
     }
-
     public class ChatMessage
     {
-        public string Role { get; set; }
-        public string Content { get; set; }
+        public string Role { get; set; } = "";
+        public string Content { get; set; } = "";
         public string Timestamp { get; } = DateTime.Now.ToString("HH:mm");
     }
 }
