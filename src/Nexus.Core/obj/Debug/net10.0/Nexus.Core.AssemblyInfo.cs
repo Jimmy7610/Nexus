@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Nexus.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8380919574b20fa9033d02d9d66022a5202d0c80")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ffd0d4e5ff32c5783022987aa69a4bc8cf68c628")]
 [assembly: System.Reflection.AssemblyProductAttribute("Nexus.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Nexus.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

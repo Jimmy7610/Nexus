@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:Nexus.App.ViewModels"
         xmlns:conv="clr-namespace:Nexus.App.Converters"
-        Title="NEXUS" Height="740" Width="1040"
+        Title="NEXUS" Height="740" Width="1100"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         WindowStartupLocation="CenterScreen">
 
@@ -12,20 +12,20 @@
     </Window.DataContext>
 
     <Border Background="{StaticResource BaseBackgroundBrush}" 
-            BorderBrush="{StaticResource CyberCyanBrush}" 
+            BorderBrush="{StaticResource BorderBrush}" 
             BorderThickness="1" 
-            CornerRadius="4"
+            CornerRadius="8"
             MouseDown="Border_MouseDown">
-        <Grid>
+        <Grid Margin="10">
             <Grid.RowDefinitions>
-                <RowDefinition Height="70"/> <!-- Header -->
-                <RowDefinition Height="180"/> <!-- Peripherals: Gauges (Secondary) -->
-                <RowDefinition Height="*"/>   <!-- Primary Content -->
-                <RowDefinition Height="35"/>  <!-- Footer -->
+                <RowDefinition Height="60"/> <!-- Header -->
+                <RowDefinition Height="220"/> <!-- Gauges + AI Diagnostics -->
+                <RowDefinition Height="*"/>   <!-- Main Logic Grid -->
+                <RowDefinition Height="30"/>  <!-- Footer -->
             </Grid.RowDefinitions>
 
-            <!-- HEADER -->
-            <Grid Grid.Row="0" Margin="30,0">
+            <!-- HEADER (Literal) -->
+            <Grid Grid.Row="0" Margin="20,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
@@ -33,219 +33,199 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <Path Data="M0,0 L12,0 L12,12 L0,12 Z M3,3 L9,3 L9,9 L3,9 Z" Fill="{StaticResource CyberCyanBrush}" Width="12" Margin="0,0,15,0" Opacity="0.9"/>
-                    <TextBlock Text="NEXUS MISSION CONTROL" Style="{StaticResource HUDTitle}"/>
+                    <Path Data="M0,0 L10,0 L10,10 L0,10 Z M2,2 L8,2 L8,8 L2,8 Z" Fill="{StaticResource CyberCyanBrush}" Width="10" Margin="0,0,15,0"/>
+                    <TextBlock Text="SYSTEM CONTROL CENTER" Style="{StaticResource HUDTitle}"/>
                 </StackPanel>
 
-                <!-- Navigation Tabs -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
-                    <RadioButton Content="OVERVIEW" Style="{StaticResource HUDTabItem}" Command="{Binding NavigateCommand}" CommandParameter="OVERVIEW" IsChecked="True"/>
-                    <RadioButton Content="STORAGE" Style="{StaticResource HUDTabItem}" Command="{Binding NavigateCommand}" CommandParameter="STORAGE"/>
-                    <RadioButton Content="AI CORE" Style="{StaticResource HUDTabItem}" Command="{Binding NavigateCommand}" CommandParameter="AI"/>
+                    <RadioButton Content="OVERVIEW" Style="{StaticResource HUDTabItem}" IsChecked="True"/>
+                    <RadioButton Content="PERFORMANCE" Style="{StaticResource HUDTabItem}"/>
+                    <RadioButton Content="STORAGE" Style="{StaticResource HUDTabItem}"/>
+                    <RadioButton Content="NETWORK" Style="{StaticResource HUDTabItem}"/>
+                    <RadioButton Content="AI COPILOT" Style="{StaticResource HUDTabItem}"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding CurrentMetrics.Uptime, Mode=OneWay, StringFormat={}SYS_UPTIME: {0:hh}h {0:mm}m}" Style="{StaticResource HUDPanelHeader}" Margin="20,0" Opacity="0.8"/>
-                    <Button Content="↺" Command="{Binding RestartCommand}" Style="{StaticResource HUDButton}" Width="36" Height="30" Margin="5,0"/>
-                    <Button Content="✕" Click="Close_Click" Style="{StaticResource HUDButton}" Width="36" Height="30" Margin="5,0" Foreground="{StaticResource CriticalBrush}"/>
+                    <TextBlock Text="{Binding CurrentMetrics.Uptime, Mode=OneWay, StringFormat={}Uptime: {0:hh}h {0:mm}m}" Style="{StaticResource HUDHeader}" Margin="20,0"/>
+                    <TextBlock Text="Power: 85% (Plugged In)" Style="{StaticResource HUDHeader}" Opacity="0.7"/>
+                    <Button Content="✕" Click="Close_Click" Margin="20,0,0,0" Foreground="{StaticResource CriticalBrush}" Background="Transparent" BorderThickness="0" Cursor="Hand"/>
                 </StackPanel>
             </Grid>
 
-            <!-- SECONDARY GAUGES -->
-            <Grid Grid.Row="1" Margin="20,0">
+            <!-- TOP ROW (Gauges + AI Diagnostics) -->
+            <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="550"/> <!-- 4 Gauges -->
+                    <ColumnDefinition Width="*"/>   <!-- AI Diagnostics -->
                 </Grid.ColumnDefinitions>
 
-                <ProgressBar Grid.Column="0" Value="{Binding CurrentMetrics.CpuUsage, Mode=OneWay}" Tag="CPU" Style="{StaticResource CircularGauge}"/>
-                <ProgressBar Grid.Column="1" Value="{Binding CurrentMetrics.GpuUsage, Mode=OneWay}" Tag="GPU" Style="{StaticResource CircularGauge}" Foreground="{StaticResource WarningBrush}"/>
-                <ProgressBar Grid.Column="2" Value="{Binding CurrentMetrics.RamUsagePercentage, Mode=OneWay}" Tag="RAM" Style="{StaticResource CircularGauge}" Foreground="{StaticResource SuccessBrush}"/>
-                
-                <ItemsControl Grid.Column="3" ItemsSource="{Binding Disks}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate><Grid/></ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <ProgressBar Value="{Binding UsagePercentage, Mode=OneWay}" Tag="{Binding DriveName}" Style="{StaticResource CircularGauge}"/>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                <!-- 4 PERIPHERAL GAUGES -->
+                <ContentControl Style="{StaticResource HUDPanel}">
+                    <UniformGrid Columns="4">
+                        <ProgressBar Value="{Binding CurrentMetrics.CpuUsage}" Tag="CPU USAGE" Style="{StaticResource HUDGauge}" Margin="10"/>
+                        <ProgressBar Value="{Binding CurrentMetrics.GpuUsage}" Tag="GPU USAGE" Style="{StaticResource HUDGauge}" Margin="10"/>
+                        <ProgressBar Value="{Binding CurrentMetrics.RamUsagePercentage}" Tag="RAM" Style="{StaticResource HUDGauge}" Margin="10"/>
+                        <ProgressBar Value="45" Tag="DISK C:" Style="{StaticResource HUDGauge}" Margin="10"/>
+                    </UniformGrid>
+                </ContentControl>
+
+                <!-- AI DIAGNOSTICS -->
+                <ContentControl Grid.Column="1" Style="{StaticResource HUDPanel}">
+                    <Grid>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,-25,0,0">
+                             <Ellipse Width="8" Height="8" Fill="{StaticResource WarningBrush}" Margin="0,0,10,0"/>
+                             <TextBlock Text="AI DIAGNOSTICS" Style="{StaticResource HUDHeader}"/>
+                        </StackPanel>
+                        
+                        <StackPanel Margin="0,5">
+                            <StackPanel Orientation="Horizontal" Margin="0,5">
+                                <Ellipse Width="10" Height="10" Fill="{StaticResource SuccessBrush}" Margin="0,0,15,0"/>
+                                <TextBlock Text="System running smoothly." Style="{StaticResource HUDTextBase}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,5">
+                                <Ellipse Width="10" Height="10" Fill="{StaticResource CriticalBrush}" Margin="0,0,15,0"/>
+                                <TextBlock Text="High RAM usage detected." Style="{StaticResource HUDTextBase}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,5">
+                                <Ellipse Width="10" Height="10" Fill="{StaticResource SuccessBrush}" Margin="0,0,15,0"/>
+                                <TextBlock Text="2 large files found on drive C:" Style="{StaticResource HUDTextBase}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,5">
+                                <Ellipse Width="10" Height="10" Fill="{StaticResource WarningBrush}" Margin="0,0,15,0"/>
+                                <TextBlock Text="Suggested Cleanup Ready:" Style="{StaticResource HUDTextBase}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </ContentControl>
             </Grid>
 
-            <!-- ACTIVE CONTENT -->
-            <Grid Grid.Row="2" Margin="25,10">
-                
-                <!-- OVERVIEW VIEW (Tiered Hierarchy) -->
-                <Grid Visibility="{Binding CurrentView, Converter={StaticResource ViewToVisibilityConverter}, ConverterParameter=OVERVIEW}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="280"/> <!-- Tertiary Sidebar -->
-                        <ColumnDefinition Width="*"/>   <!-- Primary Center -->
-                        <ColumnDefinition Width="280"/> <!-- Tertiary Sidebar -->
-                    </Grid.ColumnDefinitions>
+            <!-- MAIN DATA GRID (3 Columns) -->
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="280"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="300"/>
+                </Grid.ColumnDefinitions>
 
-                    <!-- Left Sidebar (Tertiary) -->
-                    <ContentControl Grid.Column="0" Style="{StaticResource HUDPanel}" Opacity="0.85">
+                <!-- LEFT COLUMN -->
+                <StackPanel Grid.Column="0">
+                    <ContentControl Style="{StaticResource HUDPanel}" Height="180">
                         <Grid>
-                            <TextBlock Text="NETWORK TELEMETRY" Style="{StaticResource HUDPanelHeader}"/>
-                            <StackPanel VerticalAlignment="Center" Margin="0,30,0,0">
-                                <Grid Margin="0,8">
-                                    <TextBlock Text="UPLINK" Style="{StaticResource HUDLabel}"/>
-                                    <TextBlock Text="{Binding NetworkMetrics.UploadSpeedMbps, StringFormat={}{0:F2} MBPS}" Style="{StaticResource HUDMonoReadout}" HorizontalAlignment="Right" Foreground="{StaticResource WarningBrush}"/>
+                            <TextBlock Text="NETWORK" Style="{StaticResource HUDHeader}" Margin="0,-25,0,0"/>
+                            <StackPanel VerticalAlignment="Center">
+                                <Grid Margin="0,5">
+                                    <TextBlock Text="Download" Style="{StaticResource HUDTextBase}"/>
+                                    <TextBlock Text="32.5 MB/s" Style="{StaticResource HUDHeader}" HorizontalAlignment="Right"/>
                                 </Grid>
-                                <Grid Margin="0,8">
-                                    <TextBlock Text="DOWNLINK" Style="{StaticResource HUDLabel}"/>
-                                    <TextBlock Text="{Binding NetworkMetrics.DownloadSpeedMbps, StringFormat={}{0:F2} MBPS}" Style="{StaticResource HUDMonoReadout}" HorizontalAlignment="Right" Foreground="{StaticResource SuccessBrush}"/>
+                                <Grid Margin="0,5">
+                                    <TextBlock Text="Upload" Style="{StaticResource HUDTextBase}"/>
+                                    <TextBlock Text="8.2 MB/s" Style="{StaticResource HUDHeader}" HorizontalAlignment="Right"/>
                                 </Grid>
-                                <Border Height="1" Background="{StaticResource BorderBrush}" Opacity="0.2" Margin="0,20"/>
-                                <TextBlock Text="LINK STABLE" Style="{StaticResource HUDMicroLabel}" HorizontalAlignment="Center" Opacity="0.4"/>
                             </StackPanel>
                         </Grid>
                     </ContentControl>
 
-                    <!-- PRIMARY CENTER: PERFORMANCE MATRIX -->
-                    <ContentControl Grid.Column="1" Style="{StaticResource HUDPanel}">
+                    <ContentControl Style="{StaticResource HUDPanel}" Height="220">
                         <Grid>
-                            <TextBlock Text="LIVE PERFORMANCE MATRIX" Style="{StaticResource HUDPanelHeader}" Opacity="0.9"/>
-                            <ContentControl Style="{StaticResource HUDChartFrame}" Margin="0,30,0,10">
-                                <Grid>
-                                    <Path Data="M0,80 L30,70 L60,75 L90,40 L120,50 L150,20 L180,30 L210,10" 
-                                          Stroke="{StaticResource CyberCyanBrush}" StrokeThickness="3.0" 
-                                          Stretch="Fill" Margin="40">
-                                        <Path.Effect>
-                                            <DropShadowEffect BlurRadius="15" Color="{StaticResource CyberCyanColor}" ShadowDepth="0" Opacity="0.8"/>
-                                        </Path.Effect>
-                                    </Path>
+                            <TextBlock Text="STORAGE ANALYSIS" Style="{StaticResource HUDHeader}" Margin="0,-25,0,0"/>
+                            <StackPanel>
+                                <TextBlock Text="LARGEST FOLDERS" Style="{StaticResource HUDHeader}" Opacity="0.6" Margin="0,5"/>
+                                <Rectangle Height="60" Fill="#10FFFFFF" Margin="0,5"/>
+                                <Border Height="1" Background="{StaticResource BorderBrush}" Opacity="0.2" Margin="0,10"/>
+                                <Grid Margin="0,2">
+                                    <TextBlock Text="Total Files: 285.600" Style="{StaticResource HUDTextBase}"/>
                                 </Grid>
+                                <Grid Margin="0,2">
+                                    <TextBlock Text="Duplicates: 1,532" Style="{StaticResource HUDTextBase}"/>
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+                    </ContentControl>
+                </StackPanel>
+
+                <!-- CENTER COLUMN (Dominant Charts) -->
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <ContentControl Grid.Row="0" Style="{StaticResource HUDPanel}">
+                        <ContentControl Style="{StaticResource HUDChartFrame}">
+                             <Path Data="M0,80 L50,70 L100,75 L150,40 L200,50 L250,20 L300,30 L350,10" 
+                                   Stroke="{StaticResource CyberCyanBrush}" StrokeThickness="2" Stretch="Fill" Margin="20"/>
+                        </ContentControl>
+                    </ContentControl>
+
+                    <ContentControl Grid.Row="1" Style="{StaticResource HUDPanel}">
+                        <ContentControl Style="{StaticResource HUDChartFrame}">
+                             <Path Data="M0,50 L50,60 L100,55 L150,80 L200,70 L250,90 L300,75 L350,85" 
+                                   Stroke="{StaticResource WarningBrush}" StrokeThickness="2" Stretch="Fill" Margin="20"/>
+                        </ContentControl>
+                    </ContentControl>
+                </Grid>
+
+                <!-- RIGHT COLUMN -->
+                <Grid Grid.Column="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="180"/>
+                        <RowDefinition Height="140"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <ContentControl Grid.Row="0" Style="{StaticResource HUDPanel}">
+                        <Grid>
+                            <TextBlock Text="ACTIVE PROCESSES" Style="{StaticResource HUDHeader}" Margin="0,-25,0,0"/>
+                            <StackPanel Margin="0,5">
+                                <Grid Margin="0,2">
+                                    <TextBlock Text="Chrome" Style="{StaticResource HUDTextBase}"/>
+                                    <TextBlock Text="850 MB" Style="{StaticResource HUDHeader}" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <Grid Margin="0,2">
+                                    <TextBlock Text="Discord" Style="{StaticResource HUDTextBase}"/>
+                                    <TextBlock Text="420 MB" Style="{StaticResource HUDHeader}" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+                    </ContentControl>
+
+                    <ContentControl Grid.Row="1" Style="{StaticResource HUDPanel}">
+                        <Grid>
+                            <TextBlock Text="NETWORK MONITOR" Style="{StaticResource HUDHeader}" Margin="0,-25,0,0"/>
+                            <ContentControl Style="{StaticResource HUDChartFrame}">
+                                 <Path Data="M0,80 L50,60 L100,90 L150,70 L200,85" Stroke="{StaticResource CyberCyanBrush}" Stretch="Fill" Margin="5"/>
                             </ContentControl>
                         </Grid>
                     </ContentControl>
 
-                    <!-- Right Sidebar (Tertiary) -->
-                    <ContentControl Grid.Column="2" Style="{StaticResource HUDPanel}" Opacity="0.85">
+                    <!-- AI COPILOT (Literal) -->
+                    <ContentControl Grid.Row="2" Style="{StaticResource HUDPanel}">
                         <Grid>
-                            <TextBlock Text="CORE PROCESSES" Style="{StaticResource HUDPanelHeader}"/>
-                            <ItemsControl ItemsSource="{Binding CurrentMetrics.Processes}" Margin="0,30,0,0">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid Margin="0,6">
-                                            <TextBlock Text="{Binding Name}" Style="{StaticResource HUDTextBase}" FontSize="11"/>
-                                            <TextBlock Text="{Binding FormattedRam}" Style="{StaticResource HUDMonoReadout}" HorizontalAlignment="Right" FontSize="11" Foreground="{StaticResource SuccessBrush}" Opacity="0.9"/>
-                                        </Grid>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </Grid>
-                    </ContentControl>
-                </Grid>
-
-                <!-- STORAGE VIEW (Clean Analytics) -->
-                <Grid Visibility="{Binding CurrentView, Converter={StaticResource ViewToVisibilityConverter}, ConverterParameter=STORAGE}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="380"/>
-                    </Grid.ColumnDefinitions>
-
-                    <ContentControl Grid.Column="0" Style="{StaticResource HUDPanel}">
-                        <Grid>
-                            <TextBlock Text="STORAGE ANALYTICS" Style="{StaticResource HUDPanelHeader}"/>
-                            <ScrollViewer Margin="0,35,0,0" VerticalScrollBarVisibility="Hidden">
-                                <ItemsControl ItemsSource="{Binding StorageResult.TopFolders}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Grid Margin="0,8">
-                                                <TextBlock Text="{Binding Path}" Style="{StaticResource HUDTextBase}" Opacity="0.9" MaxWidth="450" TextTrimming="CharacterEllipsis"/>
-                                                <TextBlock Text="{Binding FormattedSize}" Style="{StaticResource HUDMonoReadout}" HorizontalAlignment="Right" Foreground="{StaticResource SuccessBrush}"/>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </ScrollViewer>
-                        </Grid>
-                    </ContentControl>
-
-                    <ContentControl Grid.Column="1" Style="{StaticResource HUDPanel}">
-                        <Grid>
-                            <TextBlock Text="SCAN STATUS" Style="{StaticResource HUDPanelHeader}"/>
-                            <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="{Binding StorageResult.TotalFiles, StringFormat={}{0:N0}}" Style="{StaticResource HUDMonoReadout}" FontSize="40" HorizontalAlignment="Center" Margin="0,15"/>
-                                <TextBlock Text="FILES INDEXED" Style="{StaticResource HUDLabel}" HorizontalAlignment="Center" Opacity="0.8"/>
-                                
-                                <Button Content="RESCAN TARGET" Command="{Binding StartScanCommand}" CommandParameter="C:\" 
-                                        Style="{StaticResource HUDButton}" Margin="40,40,40,10" Height="45"
-                                        IsEnabled="{Binding StorageResult.IsScanning, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverted}"/>
-                                
-                                <Button Content="ABORT MISSION" Command="{Binding CancelScanCommand}" 
-                                        Style="{StaticResource HUDButton}" Margin="40,0" Foreground="{StaticResource CriticalBrush}"
-                                        Visibility="{Binding StorageResult.IsScanning, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            <TextBlock Text="AI COPILOT" Style="{StaticResource HUDHeader}" Margin="0,-25,0,0"/>
+                            <StackPanel VerticalAlignment="Bottom">
+                                <TextBlock Text="How can I assist you?" Style="{StaticResource HUDTextBase}" Margin="0,0,0,10"/>
+                                <Button Content="Find large Files" Style="{StaticResource HUDTabItem}" HorizontalAlignment="Left" Margin="0,2"/>
+                                <Button Content="System Health Report" Style="{StaticResource HUDTabItem}" HorizontalAlignment="Left" Margin="0,2"/>
+                                <Border Height="35" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" Margin="0,10,0,0">
+                                     <TextBlock Text="Ask me anything..." Opacity="0.4" Margin="10,0"/>
+                                </Border>
                             </StackPanel>
                         </Grid>
                     </ContentControl>
                 </Grid>
-
-                <!-- AI CORE (Operational Interlink) -->
-                <Grid Visibility="{Binding CurrentView, Converter={StaticResource ViewToVisibilityConverter}, ConverterParameter=AI}">
-                    <ContentControl Style="{StaticResource HUDPanel}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="280"/>
-                            </Grid.ColumnDefinitions>
-
-                            <Grid Grid.Column="0" Margin="10">
-                                <TextBlock Text="NEURAL INTERLINK" Style="{StaticResource HUDPanelHeader}"/>
-                                <ListBox ItemsSource="{Binding ChatHistory}" Background="Transparent" BorderThickness="0" Margin="0,30,0,65" ScrollViewer.VerticalScrollBarVisibility="Hidden">
-                                    <ListBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="0,15">
-                                                <StackPanel>
-                                                    <TextBlock Text="{Binding Role}" Style="{StaticResource HUDPanelHeader}" FontSize="8" Margin="0,0,0,5"/>
-                                                    <TextBlock Text="{Binding Content}" Style="{StaticResource HUDTextBase}" TextWrapping="Wrap"/>
-                                                </StackPanel>
-                                            </Border>
-                                        </DataTemplate>
-                                    </ListBox.ItemTemplate>
-                                </ListBox>
-
-                                <TextBox Text="{Binding ChatInput, UpdateSourceTrigger=PropertyChanged}" 
-                                         VerticalAlignment="Bottom" Height="45"
-                                         Background="#08FFFFFF" Foreground="White" BorderBrush="{StaticResource BorderBrush}" 
-                                         Padding="15,0" VerticalContentAlignment="Center" FontFamily="Consolas">
-                                    <TextBox.InputBindings>
-                                        <KeyBinding Key="Enter" Command="{Binding SendChatCommand}"/>
-                                    </TextBox.InputBindings>
-                                </TextBox>
-                            </Grid>
-
-                            <StackPanel Grid.Column="1" Margin="20,40,10,10">
-                                <TextBlock Text="ACTIVE MODEL" Style="{StaticResource HUDPanelHeader}"/>
-                                <TextBlock Text="{Binding ActiveAiModel}" Style="{StaticResource HUDMonoReadout}" Margin="0,10,0,30" Foreground="{StaticResource SuccessBrush}"/>
-                                
-                                <TextBlock Text="QUICK ACTIONS" Style="{StaticResource HUDPanelHeader}" Margin="0,0,0,10" Opacity="0.6"/>
-                                <Button Content="SYSTEM HEALTH" Command="{Binding QuickPromptCommand}" CommandParameter="Summarize system health." Style="{StaticResource HUDButton}" Margin="0,5"/>
-                                <Button Content="OPTIMIZE DATA" Command="{Binding QuickPromptCommand}" CommandParameter="Suggest optimizations." Style="{StaticResource HUDButton}" Margin="0,5"/>
-                            </StackPanel>
-                        </Grid>
-                    </ContentControl>
-                </Grid>
-
+                
             </Grid>
 
             <!-- FOOTER -->
-            <Grid Grid.Row="3" Margin="30,0">
-                <TextBlock Text="NEXUS MISSION CONTROL // v1.2.2-ACTIVE // [ENERGY_HIERARCHY: RESTORED]" Style="{StaticResource HUDMicroLabel}" VerticalAlignment="Center" Opacity="0.3"/>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                    <Ellipse Width="6" Height="6" Fill="{StaticResource SuccessBrush}" VerticalAlignment="Center" Margin="0,0,8,0">
-                        <Ellipse.Effect>
-                            <DropShadowEffect BlurRadius="8" Color="{StaticResource SuccessColor}" ShadowDepth="0" Opacity="0.6"/>
-                        </Ellipse.Effect>
-                    </Ellipse>
-                    <TextBlock Text="{Binding AiStatus}" Style="{StaticResource HUDPanelHeader}" Foreground="{StaticResource SuccessBrush}" Opacity="0.9"/>
-                </StackPanel>
-            </Grid>
+            <Border Grid.Row="3" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0" Margin="10,0">
+                <Grid>
+                     <TextBlock Text="NEXUS MISSION CONTROL // LITERAL_TRANSLATION_v1.0" Style="{StaticResource HUDHeader}" Opacity="0.3" VerticalAlignment="Center"/>
+                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                          <Ellipse Width="6" Height="6" Fill="{StaticResource SuccessBrush}" VerticalAlignment="Center" Margin="10,0"/>
+                          <TextBlock Text="AI CORE: ACTIVE" Style="{StaticResource HUDHeader}" VerticalAlignment="Center"/>
+                     </StackPanel>
+                </Grid>
+            </Border>
         </Grid>
     </Border>
 </Window>
